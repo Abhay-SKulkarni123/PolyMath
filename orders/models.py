@@ -32,6 +32,8 @@ class OrderItem(models.Model):
     product = models.ForeignKey('products.Product', on_delete=models.PROTECT, related_name='order_items')
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    download_token = models.UUIDField(null=True, blank=True, unique=True)
+    downloaded_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'order_items'

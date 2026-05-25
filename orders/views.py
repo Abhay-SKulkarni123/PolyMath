@@ -3,9 +3,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
+import uuid
 from .models import Order, OrderItem
 from .serializers import OrderSerializer, CheckoutSerializer
 from cart.models import Cart
+from django.http import FileResponse
+from django.utils import timezone
+from products.models import Product
 
 
 class CheckoutView(APIView):
@@ -16,7 +20,6 @@ class CheckoutView(APIView):
         serializer = CheckoutSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # Get cart
         try:
             cart = Cart.objects.get(user=request.user)
         except Cart.DoesNotExist:
@@ -33,16 +36,18 @@ class CheckoutView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Validate stock for all items before creating order
+        # Validate stock only for physical and experience products
         for cart_item in cart_items:
-            if cart_item.product.stock < cart_item.quantity:
-                return Response(
-                    {
-                        'error': f'Insufficient stock for {cart_item.product.name}. '
-                                 f'Available: {cart_item.product.stock}'
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            product = cart_item.product
+            if product.type in ['physical', 'experience']:
+                if product.stock < cart_item.quantity:
+                    return Response(
+                        {
+                            'error': f'Insufficient stock for {product.name}. '
+                                     f'Available: {product.stock}'
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
 
         # Calculate total
         total_price = sum(
@@ -58,17 +63,27 @@ class CheckoutView(APIView):
             status='pending'
         )
 
-        # Create order items and reduce stock
+        # Create order items
         for cart_item in cart_items:
+            product = cart_item.product
+
+            # Generate download token for digital products
+            download_token = None
+            if product.is_digital:
+                download_token = str(uuid.uuid4())
+
             OrderItem.objects.create(
                 order=order,
-                product=cart_item.product,
+                product=product,
                 quantity=cart_item.quantity,
-                price=cart_item.product.price
+                price=product.price,
+                download_token=download_token
             )
-            # Reduce stock
-            cart_item.product.stock -= cart_item.quantity
-            cart_item.product.save()
+
+            # Reduce stock only for physical and experience products
+            if product.type in ['physical', 'experience']:
+                product.stock -= cart_item.quantity
+                product.save()
 
         # Clear cart
         cart.items.all().delete()
@@ -85,14 +100,8 @@ class OrderListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Order.objects.filter(
-            user=request.user
-        ).prefetch_related('items__product')
-
-    def get_queryset(self):
-        return Order.objects.filter(
             user=self.request.user
         ).prefetch_related('items__product')
-
 
 class OrderDetailView(generics.RetrieveAPIView):
     serializer_class = OrderSerializer
@@ -102,3 +111,40 @@ class OrderDetailView(generics.RetrieveAPIView):
         return Order.objects.filter(
             user=self.request.user
         ).prefetch_related('items__product')
+    
+class DownloadProductView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, token):
+        try:
+            order_item = OrderItem.objects.select_related(
+                'product', 'order'
+            ).get(
+                download_token=token,
+                order__user=request.user
+            )
+        except OrderItem.DoesNotExist:
+            return Response(
+                {'error': 'Invalid or expired download link.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        product = order_item.product
+
+        if not product.file:
+            return Response(
+                {'error': 'No file available for this product.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Mark as downloaded
+        order_item.downloaded_at = timezone.now()
+        order_item.save()
+
+        # Serve the file
+        response = FileResponse(
+            product.file.open('rb'),
+            as_attachment=True,
+            filename=product.file.name.split('/')[-1]
+        )
+        return response

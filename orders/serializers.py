@@ -7,11 +7,21 @@ class OrderItemSerializer(serializers.ModelSerializer):
         source='product.name',
         read_only=True
     )
+    product_type = serializers.CharField(
+        source='product.type',
+        read_only=True
+    )
     item_total = serializers.ReadOnlyField()
+    download_url = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'product_name', 'quantity', 'price', 'item_total']
+        fields = ['id', 'product_name','product_type', 'quantity', 'price', 'item_total', 'download_url']
+
+    def get_download_url(self, obj):
+        if obj.download_token:
+            return f'/api/orders/download/{obj.download_token}/'
+        return None
 
 
 class OrderSerializer(serializers.ModelSerializer):
