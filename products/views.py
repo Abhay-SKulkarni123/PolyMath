@@ -1,13 +1,13 @@
 from rest_framework import generics, filters
 from rest_framework.permissions import AllowAny
-from .models import Category, Product
-from .serializers import CategorySerializer, ProductSerializer
+from .models import KnowledgeField, Product
+from .serializers import KnowledgeFieldSerializer, ProductSerializer
 from core.permissions import IsVendor, IsAdmin, IsOwnerOrAdmin
 
 
-class CategoryListCreateView(generics.ListCreateAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+class KnowledgeFieldListCreateView(generics.ListCreateAPIView):
+    queryset = KnowledgeField.objects.all()
+    serializer_class = KnowledgeFieldSerializer
 
     def get_permissions(self):
         if self.request.method == 'GET':
@@ -24,9 +24,22 @@ class ProductListView(generics.ListAPIView):
     ordering = ['-created_at']
 
     def get_queryset(self):
-        return Product.objects.filter(is_active=True).select_related(
-            'vendor'
-        ).prefetch_related('categories')
+        queryset = Product.objects.filter(
+            is_active=True
+        ).select_related('vendor').prefetch_related('knowledge_fields')
+
+        knowledge_field = self.request.query_params.get('field')
+        product_type = self.request.query_params.get('type')
+
+        if knowledge_field:
+            queryset = queryset.filter(
+                knowledge_fields__slug=knowledge_field
+            )
+
+        if product_type:
+            queryset = queryset.filter(type=product_type)
+
+        return queryset
 
 
 class ProductCreateView(generics.CreateAPIView):
