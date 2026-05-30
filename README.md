@@ -64,10 +64,10 @@ python manage.py runserver
 - [x] Swagger documentation
 - [x] Rate limiting and error handling
 - [x] Docker setup
-- [ ] Knowledge field model
-- [ ] Product type system (physical/digital/experience)
-- [ ] Digital file delivery
-- [ ] TMDB movie integration
+- [x] Knowledge field model
+- [x] Product type system (physical/digital/experience)
+- [x] Digital file delivery
+- [x] TMDB movie integration endpoint
 
 ### Frontend
 - [ ] Landing page
