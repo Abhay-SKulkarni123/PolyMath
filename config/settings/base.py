@@ -54,6 +54,9 @@ INSTALLED_APPS = [
     'products',
     'cart',
     'orders',
+
+    #TMDB
+    'tmdb',
 ]
 
 MIDDLEWARE = [
@@ -165,7 +168,7 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'MarketNest API',
+    'TITLE': 'PolyMath API',
     'DESCRIPTION': 'A Modern Multi-Vendor Marketplace Platform',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
