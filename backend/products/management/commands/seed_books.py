@@ -9,32 +9,6 @@ from products.models import Product, KnowledgeField
 from vendors.models import VendorProfile
 import urllib.request
 
-KNOWLEDGE_FIELDS = [
-    ("Science & Nature", "science-nature", "🧬", "#10b981"),
-    ("Technology & Computing", "technology-computing", "💻", "#3b82f6"),
-    ("Literature & Stories", "literature-stories", "📚", "#8b5cf6"),
-    ("Music & Sound", "music-sound", "🎵", "#ec4899"),
-    ("Visual Arts & Design", "visual-arts-design", "🎨", "#f59e0b"),
-    ("Culinary Arts", "culinary-arts", "🍳", "#ef4444"),
-    ("History & Philosophy", "history-philosophy", "🏛️", "#6366f1"),
-    ("Health & Performance", "health-performance", "💪", "#22c55e"),
-    ("Film & Cinema", "film-cinema", "🎬", "#f97316"),
-    ("Languages & Culture", "languages-culture", "🌍", "#14b8a6"),
-    ("Space & Cosmos", "space-cosmos", "🚀", "#0ea5e9"),
-    ("Psychology & Mind", "psychology-mind", "🧠", "#a855f7"),
-]
-
-for name, slug, icon, color in KNOWLEDGE_FIELDS:
-    KnowledgeField.objects.get_or_create(
-        slug=slug,
-        defaults={
-            "name": name,
-            "description": name,
-            "icon": icon,
-            "color": color,
-        },
-    )
-
 logger = logging.getLogger()
 
 OPENLIBRARY_URL = "https://openlibrary.org/search.json"
