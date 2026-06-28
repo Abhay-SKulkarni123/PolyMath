@@ -34,9 +34,16 @@ class Command(BaseCommand):
 
         vendor_profile = VendorProfile.objects.filter(user=vendor_user).first()
         if not vendor_profile:
-            vendor_profile = VendorProfile.objects.create(
+            vendor_profile = VendorProfile.objects.get_or_create(
                 user=vendor_user,
-                business_name="Polymath Books",
+                defaults={
+                    "company_name": "Polymath Books",
+                    "description": "Official Polymath Book Store",
+                    "phone_number": "",
+                    "address": "",
+                    "tax_id": "",
+                    "is_verified": True,
+                },
             )
             self.stdout.write(self.style.SUCCESS(f"Created VendorProfile for {vendor_user.email}"))
         else:
