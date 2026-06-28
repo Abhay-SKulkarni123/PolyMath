@@ -8,6 +8,9 @@ BASE_URL = "https://api.themoviedb.org/3"
 
 
 def fetch_with_retry(tmdb_id, media_type, max_attempts=3):
+    """Direct TMDB lookup with adult-content safety check baked in -
+    any response flagged adult=True is treated as unusable, same as
+    a 404, so the caller never receives or saves that data."""
     for attempt in range(max_attempts):
         try:
             r = requests.get(
@@ -16,7 +19,10 @@ def fetch_with_retry(tmdb_id, media_type, max_attempts=3):
                 timeout=20,
             )
             if r.status_code == 200:
-                return r.json()
+                data = r.json()
+                if data.get("adult") is True:
+                    return "ADULT_BLOCKED"
+                return data
             elif r.status_code == 404:
                 return None
         except (requests.exceptions.ConnectionError, requests.exceptions.SSLError, requests.exceptions.Timeout):
@@ -56,6 +62,10 @@ class Command(BaseCommand):
         for i, movie in enumerate(movies, 1):
             media_type = "tv" if movie.type == "series" else "movie"
             data = fetch_with_retry(movie.tmdb_id, media_type)
+
+            if data == "ADULT_BLOCKED":
+                self.stdout.write(self.style.ERROR(f"  [{i}/{total}] BLOCKED ADULT CONTENT: {movie.title} - left unchanged"))
+                continue
 
             if data == "FAILED" or data is None:
                 movie_failed.append(movie.title)
