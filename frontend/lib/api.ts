@@ -21,25 +21,29 @@ api.interceptors.request.use(
       }
     }
 
-    // Django's APPEND_SLASH only auto-redirects in some configs, and that
-    // redirect can behave inconsistently in production (extra round-trip,
-    // CORS preflight issues on the redirect itself). Safer to always send
-    // the trailing slash ourselves, so the request hits the real endpoint
-    // on the first try - this fixes 404s like /api/cinema/collections
-    // (missing slash) vs /api/cinema/collections/ (correct).
-    if (config.url) {
-      const hasQuery = config.url.includes("?");
-      if (!hasQuery && !config.url.endsWith("/")) {
-        config.url = `${config.url}/`;
-      } else if (hasQuery) {
-        const [path, query] = config.url.split("?");
-        if (!path.endsWith("/")) {
-          config.url = `${path}/?${query}`;
-        }
-      }
-    }
+    // KNOWN AXIOS BUG (axios/axios#1405): axios silently strips the
+    // trailing slash when it internally joins baseURL + a relative url,
+    // even though config.url is correct at this point in the interceptor.
+    // Workaround: bypass axios's own URL-joining entirely by building
+    // the full absolute URL ourselves and clearing baseURL for this
+    // request, so axios has nothing left to "normalize".
+    if (config.url && config.baseURL) {
+      let path = config.url;
+      const hasQuery = path.includes("?");
 
-    console.log("FINAL REQUEST URL:", config.baseURL, "+", config.url);
+      if (!hasQuery && !path.endsWith("/")) {
+        path = `${path}/`;
+      } else if (hasQuery) {
+        const [p, query] = path.split("?");
+        path = p.endsWith("/") ? `${p}?${query}` : `${p}/?${query}`;
+      }
+
+      const base = config.baseURL.endsWith("/") ? config.baseURL.slice(0, -1) : config.baseURL;
+      const cleanPath = path.startsWith("/") ? path : `/${path}`;
+
+      config.url = `${base}${cleanPath}`;
+      config.baseURL = ""; // nothing left for axios to join/strip
+    }
 
     return config;
   },
