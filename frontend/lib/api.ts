@@ -39,7 +39,7 @@ api.interceptors.request.use(
       }
     }
 
-    console.log("FINAL URL:", config.url);
+    console.log("FINAL REQUEST URL:", config.baseURL, "+", config.url);
 
     return config;
   },
