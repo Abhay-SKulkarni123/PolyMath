@@ -207,26 +207,6 @@ B --> G[Secure Download Service]
 
 ---
 
-## 🔐 Authentication
-
-> JWT-based login and registration.
-
-<p align="center">
-  <img src="docs/screenshots/auth.png" width="55%">
-</p>
-
----
-
-## 📱 Responsive Design
-
-> Optimized experience across desktop, tablet, and mobile devices.
-
-<p align="center">
-  <img src="docs/screenshots/responsive.png" width="90%">
-</p>
-
----
-
 # 💻 Tech Stack
 
 ### Frontend
