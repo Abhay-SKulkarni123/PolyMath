@@ -7,6 +7,12 @@ python manage.py migrate
 echo "Seeding cinema data..."
 python manage.py seed_cinema || true
 
+echo "Creating vendor & seeding books..."
+python manage.py create_vendor_seed_book || true
+
+echo "Seeding featured books..."
+python manage.py seed_featured_books || true
+
 echo "Starting Gunicorn..."
 
 exec gunicorn config.wsgi:application \
