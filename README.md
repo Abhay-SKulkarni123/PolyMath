@@ -162,7 +162,7 @@ B --> G[Secure Download Service]
 > Browse and search digital books.
 
 <p align="center">
-  <img src="docs/screenshots/books.png" width="85%">
+  <img src="docs/screenshots/books.png" width="60%">
 </p>
 
 ---
