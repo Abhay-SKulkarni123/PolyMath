@@ -39,6 +39,8 @@ api.interceptors.request.use(
       }
     }
 
+    console.log("FINAL URL:", config.url);
+
     return config;
   },
   (error) => Promise.reject(error),
