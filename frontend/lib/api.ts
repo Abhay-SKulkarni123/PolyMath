@@ -20,6 +20,25 @@ api.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
+
+    // Django's APPEND_SLASH only auto-redirects in some configs, and that
+    // redirect can behave inconsistently in production (extra round-trip,
+    // CORS preflight issues on the redirect itself). Safer to always send
+    // the trailing slash ourselves, so the request hits the real endpoint
+    // on the first try - this fixes 404s like /api/cinema/collections
+    // (missing slash) vs /api/cinema/collections/ (correct).
+    if (config.url) {
+      const hasQuery = config.url.includes("?");
+      if (!hasQuery && !config.url.endsWith("/")) {
+        config.url = `${config.url}/`;
+      } else if (hasQuery) {
+        const [path, query] = config.url.split("?");
+        if (!path.endsWith("/")) {
+          config.url = `${path}/?${query}`;
+        }
+      }
+    }
+
     return config;
   },
   (error) => Promise.reject(error),
