@@ -109,13 +109,13 @@ export default function CollectionDetailPage() {
       <div
         style={{
           position: "relative",
-          height: "55vh",
+          height: "85vh",
           zIndex: 1,
           backgroundImage: collection.banner_url
             ? `url(${collection.banner_url})`
             : "linear-gradient(135deg, #1a0a2e 0%, #2d1657 50%, #1a0a2e 100%)",
           backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundPosition: "center -20%",
           display: "flex",
           alignItems: "flex-end",
           boxSizing: "border-box",

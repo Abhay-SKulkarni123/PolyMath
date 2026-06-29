@@ -46,7 +46,9 @@ export default function Navbar() {
   return (
     <nav
       style={{
-        position: "sticky",
+        position: "fixed",
+        left: 0,
+        right: 0,
         top: 0,
         padding: "0 40px",
         height: "70px",

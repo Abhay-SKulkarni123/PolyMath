@@ -80,7 +80,7 @@ export default function HomePage() {
           style={{
             position: "relative",
             marginTop: 0,
-            height: "90vh",
+            height: "100vh",
             overflow: "hidden",
             marginBottom: "60px",
             zIndex: 1,
@@ -94,7 +94,7 @@ export default function HomePage() {
                 ? `url(${heroMovie.backdrop_url})`
                 : "linear-gradient(135deg, #1a0a2e 0%, #2d1657 50%, #1a0a2e 100%)",
               backgroundSize: "cover",
-              backgroundPosition: "center 0.001%",
+              backgroundPosition: "center -40%",
               filter: "brightness(0.65) saturate(1.1)",
             }}
           />
