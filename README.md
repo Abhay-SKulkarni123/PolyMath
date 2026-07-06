@@ -54,6 +54,8 @@ Explore hundreds of movies across curated cinematic universes, discover digital 
 
 # 📸 Application Preview
 
+> https://www.loom.com/share/4c9760a430c745a392a02b2bead2843f
+
 ---
 
 ## 🏠 Home Page
