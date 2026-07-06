@@ -50,10 +50,6 @@ Explore hundreds of movies across curated cinematic universes, discover digital 
 
 > https://polymath-production-d17c.up.railway.app/
 
-### 🎥 Demo Video
-
-> Add Loom / YouTube Demo Here
-
 ---
 
 # 📸 Application Preview
@@ -87,7 +83,7 @@ Explore hundreds of movies across curated cinematic universes, discover digital 
 ## 📚 Book Marketplace
 
 <p align="center">
-<img src="docs/screenshots/books.png" width="80%">
+<img src="docs/screenshots/books.png" width="60%">
 </p>
 
 ---
